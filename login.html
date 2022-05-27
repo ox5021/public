@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link href = "main.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">한끼한긱</a>
+      <span class="ms-auto mx-2" id="userName">userName</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="login.html">로그인</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  <header class="navbar navbar-expand-lg bg-light justify-content-center fixed-bottom">
+  <nav class="navbar">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="upload.html">글쓰기</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link">마이페이지</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+
+  <div class="container mt-3">
+    <div class="mb-3">
+      <input type="text" class="form-control" placeholder="name" id="name-new">
+    </div>
+    <div class="mb-3">
+      <input type="email" class="form-control" placeholder="email" id="email-new">
+    </div>
+    <div class="mb-3">
+      <input type="password" class="form-control" placeholder="pw" id="pw-new">
+    </div>
+    <button type="submit" class="btn btn-primary" id="register">가입하기</button>
+ </div>
+
+ 
+ <div class="container mt-3">
+    <div class="mb-3">
+      <input type="email" class="form-control" placeholder="email" id="email">
+    </div>
+    <div class="mb-3">
+      <input type="password" class="form-control" placeholder="pw" id="pw">
+    </div>
+    <button type="submit" class="btn btn-primary" id="login" >로그인하기</button>
+    <button type="submit" class="btn btn-primary" id="logout">로그아웃</button>
+ </div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-storage.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+
+  <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBzUz8fSNI552eVVv-dVehU6jACZB79VEY",
+  authDomain: "gachondelivery.firebaseapp.com",
+  projectId: "gachondelivery",
+  storageBucket: "gachondelivery.appspot.com",
+  messagingSenderId: "828058667500",
+  appId: "1:828058667500:web:412023ac753a957946d8c9",
+  measurementId: "G-DJCPH7RNW2"
+};
+
+  // Intialize Firebase
+  firebase.initializeApp(firebaseConfig) 
+  </script>
+
+  <script> 
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    const idInput = document.getElementById('email'),
+    pwInput = document.getElementById('pw');
+    const loginBtn = document.getElementById('login');
+
+
+const isActiveLogin = () => {
+  let idValue = idInput.value;
+  let pwValue = pwInput.value;
+
+  if(
+      (idValue && pwValue) && 
+      (pwValue.length >= 5) && 
+      (idValue.includes('@') || idValue.length >= 5)
+      ) {
+      loginBtn.disabled = false;
+      loginBtn.style.opacity = 1;
+      loginBtn.style.cursor = 'pointer';
+  }
+  else {
+      loginBtn.disabled = true;
+      loginBtn.style.opacity = .3;
+  }
+}
+
+const init = () => {
+  idInput.addEventListener('input', isActiveLogin);
+  pwInput.addEventListener('input', isActiveLogin);
+  idInput.addEventListener('keyup', isActiveLogin);
+  pwInput.addEventListener('keyup', isActiveLogin);
+}
+
+init();
+
+    firebase.auth().onAuthStateChanged((user)=>{
+            if (user) {
+                console.log(user.displayName)
+                console.log(user.uid)
+                localStorage.setItem('user',JSON.stringify(user))
+                
+            }
+        })
+
+    $('#logout').click(function(){
+        firebase.auth().signOut()
+        localStorage.removeItem('user')
+    })
+
+    $('#login').click(function(){
+
+        var 이메일 = $('#email').val();
+        var 패스워드 = $('#pw').val(); 
+
+        firebase.auth().signInWithEmailAndPassword(이메일, 패스워드).then((result)=>{
+
+            console.log(result.user)
+
+        })
+    })
+
+    $('#register').click(function(){
+
+        var 이메일 = $('#email-new').val();
+        var 패스워드 = $('#pw-new').val();
+        var 이름 = $('#name-new').val();
+
+        firebase.auth().createUserWithEmailAndPassword(이메일, 패스워드)
+        .then((result)=>{
+
+          var 유저정보 = { name : 이름, email : 이메일 }
+        db.collection('user').doc(result.user.uid).set(유저정보)
+        
+        console.log(result)
+        console.log(result.user)
+        result.user.updateProfile({displayName : 이름})
+
+    })
+})
+
+var 뺀거 = localStorage.getItem('user')
+    $('#userName').html(JSON.parse(뺀거).displayName)
+
+    
+
+
+
+  </script>
+</body>
+</html>
+

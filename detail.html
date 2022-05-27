@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link href = "main.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">한끼한긱</a>
+      <span class="ms-auto mx-2" id="userName">userName</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="login.html">로그인</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  <header class="navbar navbar-expand-lg bg-light justify-content-center fixed-bottom">
+  <nav class="navbar">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="upload.html">글쓰기</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link">마이 페이지</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+  <div class="container">
+    상세페이지
+    <button id="edit">수정하기</button>
+    <div class="detail-pic my-4" style="background-image: url('https://placeimg.com/640/380/tech');"></div>
+    <div>
+      <h5>올린사람 : </h5>
+      <hr>
+      <h5 class="title"></h5>
+      <p class="date"></p>
+      <p class="price"></p>
+    </div>
+    <button id="chat" href="chat.html">채팅</button>
+  </div>
+
+  
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-storage.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+
+  <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBzUz8fSNI552eVVv-dVehU6jACZB79VEY",
+  authDomain: "gachondelivery.firebaseapp.com",
+  projectId: "gachondelivery",
+  storageBucket: "gachondelivery.appspot.com",
+  messagingSenderId: "828058667500",
+  appId: "1:828058667500:web:412023ac753a957946d8c9",
+  measurementId: "G-DJCPH7RNW2"
+};
+
+  // Intialize Firebase
+  firebase.initializeApp(firebaseConfig) 
+  </script>
+
+  <script> 
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    firebase.auth().onAuthStateChanged((user)=>{
+        if (user) {
+          //로그인 아닐 때 글 작성 버튼 없애기 추가해야함
+            console.log(user.displayName)
+            console.log(user.uid)
+            $('#userName').html(user.displayName)
+        }
+    })
+
+    var 쿼리스트링 = new URLSearchParams(window.location.search);
+
+    var 내uid = JSON.parse(localStorage.getItem('user')).uid;
+
+    $('#chat').click(function(){
+      var 데이터 = {
+      who : [내uid, 판매자uid] ,
+      product : 상품명,
+      date : new Date()
+    }
+  db.collection('chatroom').add(데이터)
+  window.location.href = '/chat.html'
+})
+      var 판매자uid;
+      var 상품명;
+
+      db.collection('product').doc(쿼리스트링.get('id')).get().then((result)=>{
+      
+      판매자uid = result.data().uid;
+      상품명 = result.data().제목; 
+    
+    })
+
+    db.collection('product').doc(쿼리스트링.get('id')).get().then((result)=>{
+
+      console.log(result.data())
+
+      $('.author').html('올린사람 : ' + result.data().이름)
+      $('.title').html(result.data().제목)
+      $('.price').html(result.data().가격 + '원')
+      $('.detail-pic').css('background-image', 'url(${result.data().이미지})')
+      
+    })
+
+    $('#edit').click(function(){
+    window.location.href = '/edit.html?id=' + 쿼리스트링.get('id')
+  })
+
+
+  </script>
+</body>
+</html>
+
